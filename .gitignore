@@ -1,0 +1,25 @@
+
+#ignore thumbnails created by windows
+Thumbs.db
+#Ignore files build by Visual Studio
+*.obj
+*.cogui
+*.comarker
+build.xml
+link.ld
+memory.ld
+*Target*
+*.config
+
+.cproject
+.project
+.register
+.xml
+.objs/
+Debug/
+Test01.elf.xcodeproj/project.pbxproj
+Test01.ebp
+Test01.coproj
+Test01.cob.bak
+Release_Notes.html
+Test01.elay
