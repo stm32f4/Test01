@@ -13,15 +13,15 @@
 //#define  _mario
 //#define  _mireCouleur
 //#define  _mireGris
-#define  _gradientCouleur
-#define  _gradientGris
-#define  _fractal
-#define  _colorBox
+//#define  _gradientCouleur
+//#define  _gradientGris
+//#define  _fractal
+//#define  _colorBox
 //#define _trackTouch
 //#define _drawGrid
 //#define _showMenu
 //#define _TC_calibrate
-#define _testReadRam
+//#define _testReadRam
 #define _testFPU
 
 /* Includes ------------------------------------------------------------------*/
@@ -85,6 +85,7 @@ void drawGrid(u8 xScale, u8 yScale);
 void initStatusBar(char info[]);
 void writeStatus(char info[]);
 void initSystick(void);
+void initMenu(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -103,18 +104,27 @@ int main(void) {
 #endif
 #ifdef _showMenu
 	initMenu();
+	Delay_ms(5000);
 #endif
 
 	while (1) {
 		TP_Press = 0;
 #ifdef _welcome
 		dispWelcome();
+		//Delay_ms(100);
 #endif
 #ifdef _testReadRam
 		testReadRam();
 #endif
 #ifdef _testFPU
 		testFPU();
+		while(0) {
+            Read_Ads7846_filter();
+            Convert_Pos();
+            if(Pen_Point.X > 10) {
+                break;
+            }
+		}
 #endif
 #ifdef _gamma18
 		dispGamma18();
@@ -163,17 +173,17 @@ void fractal(void) {
 	LCD_SetColors(0xFF, 0XFF, 0xFF, 0, 0, 0);
 	LCD_CharSize(16);
 
-//	LCD_StringLine(0, 303, (uint8_t*) "Julia 1\0");
-//	time = GetTicks();
-//	Julia(240, 300, 120, 150, 500, 123874.4576654543F);
-//	time = (GetTicks() - time) / 10;
-//	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
+	LCD_StringLine(0, 303, (char*) "Julia 1\0");
+	time = GetTicks();
+	Julia(240, 300, 120, 150, 500, 123874.4576654543F);
+	time = (GetTicks() - time) / 10;
+	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
 
-//	LCD_StringLine(0, 303, (uint8_t*) "Julia 2\0");
-//	time = GetTicks();
-//	Julia2(240, 300, 120, 150, zoom);
-//	time = (GetTicks() - time) / 10;
-//	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
+	LCD_StringLine(0, 303, (char*) "Julia 2\0");
+	time = GetTicks();
+	Julia2(240, 300, 120, 150, zoom);
+	time = (GetTicks() - time) / 10;
+	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
 
 	LCD_StringLine(0, 304, "Julia 3\0");
 	time = GetTicks();
@@ -181,35 +191,35 @@ void fractal(void) {
 	time = (GetTicks() - time) / 10;
 	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
 
-//	LCD_StringLine(0, 304, "Julia 4\0");
-//	time = GetTicks();
-//	Julia4(240, 300, 120, 150, zoom);
-//	time = (GetTicks() - time) / 10;
-//	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
+	LCD_StringLine(0, 304, "Julia 4\0");
+	time = GetTicks();
+	Julia4(240, 300, 120, 150, zoom);
+	time = (GetTicks() - time) / 10;
+	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
 
-//	LCD_StringLine(0, 304, (uint8_t*) "Julia 5\0");
-//	time = GetTicks();
-//	Julia5(240, 300, 120, 150, zoom);
-//	time = (GetTicks() - time) / 10;
-//	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
+	LCD_StringLine(0, 304, (char*) "Julia 5\0");
+	time = GetTicks();
+	Julia5(240, 300, 120, 150, zoom);
+	time = (GetTicks() - time) / 10;
+	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
 
-//	LCD_StringLine(0, 304, (uint8_t*) "Julia 6\0");
-//	time = GetTicks();
-//	Julia6(240, 300, 120, 150, zoom);
-//	time = (GetTicks() - time) / 10;
-//	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
+	LCD_StringLine(0, 304, (char*) "Julia 6\0");
+	time = GetTicks();
+	Julia6(240, 300, 120, 150, zoom);
+	time = (GetTicks() - time) / 10;
+	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
 
-//	LCD_StringLine(0, 304, (uint8_t*) "Julia 7\0");
-//	time = GetTicks();
-//	Julia7(240, 300, 120, 150, zoom);
-//	time = (GetTicks() - time) / 10;
-//	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
+	LCD_StringLine(0, 304, (char*) "Julia 7\0");
+	time = GetTicks();
+	Julia7(240, 300, 120, 150, zoom);
+	time = (GetTicks() - time) / 10;
+	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
 
-//	LCD_StringLine(0, 304, (uint8_t*) "Julia 8\0");
-//	time = GetTicks();
-//	Julia8(240, 300, 120, 150, zoom);
-//	time = (GetTicks() - time) / 10;
-//	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
+	LCD_StringLine(0, 304, (char*) "Julia 8\0");
+	time = GetTicks();
+	Julia8(240, 300, 120, 150, zoom);
+	time = (GetTicks() - time) / 10;
+	displayTime(170, 304, (uint16_t) time, 0xffffff, 0x00);
 
 	LCD_StringLine(0, 304, (char*) "Julia 9\0");
 	time = GetTicks();
@@ -223,33 +233,36 @@ void fractal(void) {
 
 void dispGamma18(void) {
 #ifdef	_gamma18
-
 	LCD_Clear(0, 0, 0);
-	LCD_Disp_Image(gamma18);
+	LCD_Disp_Image((unsigned short*)gamma18);
 	Delay_ms(imageDelay);
 #endif
 }
+
 void dispGamma20(void) {
 #ifdef	_gamma20
 	LCD_Clear(0,0,0);
-	LCD_Disp_Image(gamma20);
+	LCD_Disp_Image((unsigned short*)gamma20);
 	Delay_ms(imageDelay);
 #endif
 }
+
 void dispMireGris(void) {
 #ifdef	_mireGris
 	LCD_Clear(0, 0, 0);
-	LCD_Disp_Image(mireGris);
+	LCD_Disp_Image((unsigned short*)mireGris);
 	Delay_ms(imageDelay);
 #endif
 }
+
 void dispMireCouleur(void) {
 #ifdef	_mireCouleur
 	LCD_Clear(0, 0, 0);
-	LCD_Disp_Image(mireCouleur);
+	LCD_Disp_Image((unsigned short*)mireCouleur);
 	Delay_ms(imageDelay);
 #endif
 }
+
 void dispGradientCouleur(void) {
 #ifdef	_gradientCouleur
 	//Color gradient
@@ -286,10 +299,11 @@ void dispGradientCouleur(void) {
 	Delay_ms(imageDelay);
 #endif
 }
+
 void dispGradientGris(void) {
 #ifdef _gradientGris
 	// White gradient
-	signed int dir;
+	signed int dir = 0;
 	LCD_Clear(0, 0, 0);
 	Counter = TimeCounter;
 	red = 0;
@@ -319,6 +333,7 @@ void dispGradientGris(void) {
 	Delay_ms(imageDelay);
 #endif
 }
+
 void dispMario(void) {
 #ifdef	_mario
 	LCD_Clear(0, 0, 0);
@@ -375,6 +390,7 @@ void dispColorBox(void) {
 	Delay_ms(imageDelay);
 #endif
 }
+
 void gammaAdjust(void) {
 	// R48 Fine Gamma KP1 - KP0 	[2:0] [2:0]
 	// R49 Fine Gamma KP2 - KP3 	[2:0] [2:0]

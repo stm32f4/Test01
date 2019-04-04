@@ -12,7 +12,7 @@
 #include "ILI9325.h"
 #include "AsciiLib.h"
 
-#ifdef __FPU_USED
+#if __FPU_USED == 1
 __attribute__((always_inline)) static float inline vsqrtf(float op1) {
 	float result;
 	__asm volatile ("vsqrt.f32 %0, %1" : "=w" (result) : "w" (op1) );
@@ -27,10 +27,9 @@ __attribute__((always_inline)) static float inline vabsf(float op1) {
 
 void testFPU(void) {
 	uint32_t time;
-	uint32_t count = 10000;
+	uint32_t count = 60000;
 	char text[] = "Test of FPU unit\0";
-	char text1[] = "xxxxx0 computations\0";
-	char textRepl[22];
+	char text1[] = "       computations\0";
 	uint16_t posY = 20;
 	LCD_Clear(0xff, 0xff, 0xff);
 	LCD_SetTextColor(0x00, 0x00, 0x00);
@@ -38,9 +37,8 @@ void testFPU(void) {
 	LCD_CharSize(16);
 	LCD_StringLine(120 - ((sizeof text - 1) * 8) / 2, posY, text);
 	posY += 20;
-	memcpy(textRepl, text1, 30);
-	getDecimalFromShort((char*) textRepl, (unsigned short) (count));
-	LCD_StringLine(120 - ((sizeof textRepl - 1) * 8) / 2, posY, textRepl);
+	getDecimalFromShort((char*) text1, (unsigned short) (count));
+	LCD_StringLine(120 - ((sizeof text1 - 1) * 8) / 2, posY, text1);
 	posY += 20;
 #if __FPU_USED == 1
 	LCD_StringLine(120 - (8 * 8) / 2, posY, "With FPU\0");
@@ -140,189 +138,149 @@ void testFPU(void) {
 	Delay_ms(imageDelay);
 }
 
-void testFPUCosf(uint32_t count) {
-	float resultat1, resultat2, resultat3, resultat4, resultat5;
-	long i;
+float testFPUCosf(uint32_t count) {
+	float resultat1=0;
+	volatile float i;
 	for (i = 0; i < count; i++) {
-		resultat1 = cosf((float) i);
-		resultat2 = cosf(resultat1);
-		resultat3 = cosf(resultat2);
-		resultat4 = cosf(resultat3);
-		resultat5 = cosf(resultat4);
-		resultat1 = cosf(resultat5);
-		resultat2 = cosf(resultat1);
-		resultat3 = cosf(resultat2);
-		resultat4 = cosf(resultat3);
-		resultat5 = cosf(resultat4);
+		resultat1 += cosf(i);
 	}
+	return resultat1;
 }
 
-void testFPUSinf(uint32_t count) {
-	float resultat1, resultat2, resultat3, resultat4, resultat5;
-	long i;
+float testFPUSinf(uint32_t count) {
+	float resultat1=0;
+	volatile float i;
 	for (i = 0; i < count; i++) {
-		resultat1 = sinf((float) i);
-		resultat2 = sinf(resultat1);
-		resultat3 = sinf(resultat2);
-		resultat4 = sinf(resultat3);
-		resultat5 = sinf(resultat4);
-		resultat1 = sinf(resultat5);
-		resultat2 = sinf(resultat1);
-		resultat3 = sinf(resultat2);
-		resultat4 = sinf(resultat3);
-		resultat5 = sinf(resultat4);
+		resultat1 += sinf(i);
 	}
+	return resultat1;
 }
 
-void testFPUMult(uint32_t count) {
-	float resultat1, resultat2, resultat3, resultat4, resultat5;
-	long i;
+float testFPUMult(uint32_t count) {
+	float resultat1=0, resultat2=0, resultat3=0, resultat4=0, resultat5=0;
+	volatile float i;
 	for (i = 0; i < count; i++) {
-		resultat1 = (1.14159265358979323846f * (float) i);
-		resultat2 = resultat1 * resultat1;
-		resultat3 = resultat1 * resultat2;
-		resultat4 = resultat2 * resultat3;
-		resultat5 = resultat3 * resultat4;
-		resultat1 = resultat5 * resultat1;
-		resultat2 = resultat1 * resultat3;
-		resultat3 = resultat2 * resultat4;
-		resultat4 = resultat3 * resultat5;
-		resultat5 = resultat3 * resultat4;
+		resultat1 = i;
+		resultat2 += resultat1 * resultat1;
+		resultat3 += resultat1 * resultat2;
+		resultat4 += resultat2 * resultat3;
+		resultat5 += resultat3 * resultat4;
 	}
+	return resultat5;
 }
 
-void testFPUDiv(uint32_t count) {
-	float resultat1, resultat2, resultat3, resultat4, resultat5;
-	long i;
+float testFPUDiv(uint32_t count) {
+	float resultat1=0, resultat2=0, resultat3=0, resultat4=0, resultat5=0;
+	volatile float i;
 	for (i = 0; i < count; i++) {
-		resultat1 = (1.14159265358979323846f / (float) i);
-		resultat2 = resultat1 / resultat1;
-		resultat3 = resultat1 / resultat2;
-		resultat4 = resultat2 / resultat3;
-		resultat5 = resultat3 / resultat4;
-		resultat1 = resultat5 / resultat1;
-		resultat2 = resultat1 / resultat3;
-		resultat3 = resultat2 / resultat4;
-		resultat4 = resultat3 / resultat5;
-		resultat5 = resultat3 / resultat4;
+		resultat1 = i;
+		resultat2 += (i + resultat1) / resultat1;
+		resultat3 += resultat1 / resultat2;
+		resultat4 += resultat2 / resultat3;
+		resultat5 += resultat3 / resultat4;
 	}
+	return resultat5;
 }
 
-void testFPUVsqrtf(uint32_t count) {
-	float resultat1, resultat2, resultat3, resultat4, resultat5;
-	long i;
+float testFPUVsqrtf(uint32_t count) {
+	float resultat1=0, resultat2=0, resultat3=0, resultat4=0, resultat5=0;
+	volatile float i;
 	for (i = 0; i < count; i++) {
-		resultat1 = vsqrtf((float) i);
-		resultat2 = vsqrtf(resultat1);
-		resultat3 = vsqrtf(resultat2);
-		resultat4 = vsqrtf(resultat3);
-		resultat5 = vsqrtf(resultat4);
-		resultat1 = vsqrtf(resultat5);
-		resultat2 = vsqrtf(resultat1);
-		resultat3 = vsqrtf(resultat2);
-		resultat4 = vsqrtf(resultat3);
-		resultat5 = vsqrtf(resultat4);
+		resultat1 += vsqrtf(i);
+		resultat2 += vsqrtf(resultat1);
+		resultat3 += vsqrtf(resultat2);
+		resultat4 += vsqrtf(resultat3);
+		resultat5 += vsqrtf(resultat4);
 	}
+	return resultat5;
 }
 
-void testFPUSqrtf(uint32_t count) {
-	float resultat1, resultat2, resultat3, resultat4, resultat5;
-	long i;
+float testFPUSqrtf(uint32_t count) {
+	float resultat1=0, resultat2=0, resultat3=0, resultat4=0, resultat5=0;
+	volatile float i;
 	for (i = 0; i < count; i++) {
-		resultat1 = sqrtf((float) i);
-		resultat2 = sqrtf(resultat1);
-		resultat3 = sqrtf(resultat2);
-		resultat4 = sqrtf(resultat3);
-		resultat5 = sqrtf(resultat4);
-		resultat1 = sqrtf(resultat5);
-		resultat2 = sqrtf(resultat1);
-		resultat3 = sqrtf(resultat2);
-		resultat4 = sqrtf(resultat3);
-		resultat5 = sqrtf(resultat4);
+		resultat1 += sqrtf(i);
+		resultat2 += sqrtf(resultat1);
+		resultat3 += sqrtf(resultat2);
+		resultat4 += sqrtf(resultat3);
+		resultat5 += sqrtf(resultat4);
 	}
+	return resultat5;
 }
 
-void testFPUAdd(uint32_t count) {
-	float resultat1, resultat2, resultat3, resultat4, resultat5;
-	long i;
+float testFPUAdd(uint32_t count) {
+	float resultat1=0, resultat2=0, resultat3=0, resultat4=0, resultat5=0;
+	volatile float i;
 	for (i = 0; i < count; i++) {
-		resultat1 = ((float) i + 1234.76443686765543465487f);
-		resultat2 = (float) i + resultat1;
-		resultat3 = resultat1 + resultat2;
-		resultat4 = resultat2 + resultat3;
-		resultat5 = resultat3 + resultat4;
-		resultat1 = resultat4 + resultat5;
-		resultat2 = resultat5 + resultat1;
-		resultat3 = resultat1 + resultat2;
-		resultat4 = resultat2 + resultat3;
-		resultat5 = resultat3 + resultat4;
+		resultat1 += i;
+		resultat2 += resultat1;
+		resultat3 += resultat1 + resultat2;
+		resultat4 += resultat1 + resultat2 + resultat3;
+		resultat5 += resultat1 + resultat2 + resultat3 + resultat4;
 	}
+	return resultat5;
 }
 
-void testFPULogf(uint32_t count) {
-	float resultat1, resultat2, resultat3, resultat4, resultat5;
-	long i;
+float testFPULogf(uint32_t count) {
+	float resultat1=0, resultat2=0, resultat3=0, resultat4=0, resultat5=0;
+	volatile float i;
 	for (i = 0; i < count; i++) {
-		resultat1 = log10f((float) i);
-		resultat2 = log10f(resultat1);
-		resultat3 = log10f(resultat2);
-		resultat4 = log10f(resultat3);
-		resultat5 = log10f(resultat4);
-		resultat1 = log10f(resultat5);
-		resultat2 = log10f(resultat1);
-		resultat3 = log10f(resultat2);
-		resultat4 = log10f(resultat3);
-		resultat5 = log10f(resultat4);
+		resultat1 += log10f(i);
+		resultat2 += log10f(resultat1);
+		resultat3 += log10f(resultat2);
+		resultat4 += log10f(resultat3);
+		resultat5 += log10f(resultat4);
 	}
+	return resultat5;
 }
 
-void testFPULnf(uint32_t count) {
-	float resultat1, resultat2, resultat3, resultat4, resultat5;
-	long i;
+float testFPULnf(uint32_t count) {
+	float resultat1=0, resultat2=0, resultat3=0, resultat4=0, resultat5=0;
+	volatile float i;
 	for (i = 0; i < count; i++) {
-		resultat1 = logf((float) i);
-		resultat2 = logf(resultat1);
-		resultat3 = logf(resultat2);
-		resultat4 = logf(resultat3);
-		resultat5 = logf(resultat4);
-		resultat1 = logf(resultat5);
-		resultat2 = logf(resultat1);
-		resultat3 = logf(resultat2);
-		resultat4 = logf(resultat3);
-		resultat5 = logf(resultat4);
+		resultat1 += logf((float) i);
+		resultat2 += logf(resultat1);
+		resultat3 += logf(resultat2);
+		resultat4 += logf(resultat3);
+		resultat5 += logf(resultat4);
 	}
+	return resultat5;
 }
 
-void testFPUAbsf(uint32_t count) {
-	signed long i;
-	signed long counter = -count;
+float testFPUAbsf(uint32_t count) {
+	volatile float i;
+	volatile float counter = -count;
+	float resultat=0;
 	for (i = 0; i > counter; i--) {
-		fabsf((float) i++);
-		fabsf((float) i--);
-		fabsf((float) i++);
-		fabsf((float) i--);
-		fabsf((float) i++);
-		fabsf((float) i--);
-		fabsf((float) i++);
-		fabsf((float) i--);
-		fabsf((float) i++);
-		fabsf((float) i--);
+		resultat += fabsf(i++);
+		resultat += fabsf(i--);
+		resultat += fabsf(i++);
+		resultat += fabsf(i--);
+		resultat += fabsf(i++);
+		resultat += fabsf(i--);
+		resultat += fabsf(i++);
+		resultat += fabsf(i--);
+		resultat += fabsf(i++);
+		resultat += fabsf(i--);
 	}
+	return resultat;
 }
 
-void testFPUVabsf(uint32_t count) {
-	signed long i;
-	signed long counter = -count;
+float testFPUVabsf(uint32_t count) {
+	volatile float i;
+	volatile float counter = -count;
+	float resultat=0;
 	for (i = 0; i > counter; i--) {
-		vabsf((float) i++);
-		vabsf((float) i--);
-		vabsf((float) i++);
-		vabsf((float) i--);
-		vabsf((float) i++);
-		vabsf((float) i--);
-		vabsf((float) i++);
-		vabsf((float) i--);
-		vabsf((float) i++);
-		vabsf((float) i--);
+		resultat += vabsf((float) i++);
+		resultat += vabsf((float) i--);
+		resultat += vabsf((float) i++);
+		resultat += vabsf((float) i--);
+		resultat += vabsf((float) i++);
+		resultat += vabsf((float) i--);
+		resultat += vabsf((float) i++);
+		resultat += vabsf((float) i--);
+		resultat += vabsf((float) i++);
+		resultat += vabsf((float) i--);
 	}
+	return resultat;
 }
